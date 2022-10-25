@@ -1,45 +1,57 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import { useEffect, useState } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+import * as Dialog from "@radix-ui/react-dialog";
+
+import "./styles/main.css";
+
+import logoImg from "./assets/logo-nlw-esports.svg";
+
+import { GameBanner } from "./components/GameBanner";
+import { CreateAdBanner } from "./components/CreateAdBanner";
+import { CreateAdModal } from "./components/CreateAdModal";
+import axios from "axios";
+
+
+interface Game {
+  id: string,
+  title: string,
+  bannerUrl: string,
+  _count: {
+    ads: number
+  }
+}
+
+export function App() {
+  const [games, setGames] = useState<Game[]>([])
+
+  useEffect(() => {
+    axios("http://localhost:3333/games")
+      .then(response => setGames(response.data))
+  }, [])
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
+    <div className="max-w-[1344px] mx-auto grid place-items-center my-20">
+      <img 
+        src={logoImg} 
+        alt="" 
+      />
+
+      <strong className="text-6xl text-white font-black mt-20">Seu <span className="bg-nlw-gradient bg-clip-text text-transparent">duo</span> está aqui</strong>
+
+      <div className="grid grid-cols-6 gap-6 mt-16">
+        { games.map(game => {
+          return (
+            <GameBanner key={game.id} bannerUrl={game.bannerUrl} title={game.title} adsCount={game._count.ads} />
+          )
+        }) }
+
+      </div>
+
+      <Dialog.Root>
+        <CreateAdBanner />
+
+        <CreateAdModal />
+      </Dialog.Root>
     </div>
   )
 }
-
-export default App
